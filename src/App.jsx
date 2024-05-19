@@ -1,139 +1,67 @@
-// App.jsx
-import { useState, useCallback } from "react";
-import { useDrop } from "react-dnd";
+import { useState } from "react";
 import "./App.css";
 import "reactflow/dist/style.css";
+import useDropNode from "./Hook/useDropNode";
 import NodePanel from "./Components/Sidebar/NodePanel";
 import SettingsPanel from "./Components/Sidebar/SettingsPanel";
 import Header from "./Components/Header/Header";
 import CustomNode from "./Components/CustomNode/CustomNode";
+import { initialEdges } from "./Constants/Constants";
 import ReactFlow, {
-  ReactFlowProvider,
   addEdge,
   MiniMap,
   Controls,
   Background,
-  useNodesState,
   useEdgesState,
-  useReactFlow,
 } from "reactflow";
-import { ItemTypes } from "./ItemTypes";
-import { v4 as uuidv4 } from "uuid";
 
-const initialNodes = [
-  {
-    id: "1",
-    type: "customNode",
-    data: { label: "test message 1" },
-    position: { x: 200, y: 5 },
-  },
-];
-const initialEdges = [];
+// object that serves as a mapping between the type of nodes and their corresponding component.
 const nodeTypes = {
   customNode: CustomNode,
 };
 
 function App() {
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  // State
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [selectedNode, setSelectedNode] = useState(null);
   const [showSettingsPanel, setShowSettingsPanel] = useState(false);
-  const [nodeCount, setNodeCount] = useState(2);
-  const { project } = useReactFlow();
 
+  // Custom hook
+  const { nodeCount, isOver, drop, nodes, onNodesChange, setNodes } =
+    useDropNode();
+
+  // function is called when a new edge is created in the flowchart.
   const onConnect = (params) => setEdges((eds) => addEdge(params, eds));
 
+  // function is called when a node in the flowchart is clicked
   const handleNodeClick = (event, node) => {
     setSelectedNode(node);
     setShowSettingsPanel(true);
   };
 
+  // function is called when the text of a node in the flowchart is changed.
   const handleNodeTextChange = (id, text) => {
     setNodes((nds) =>
-      nds.map((node) =>
+      nds?.map((node) =>
         node.id === id ? { ...node, data: { ...node.data, label: text } } : node
       )
     );
   };
 
+  // function that hides the settings panel and clears the currently selected node
   const hideSettingsPanel = () => {
     setShowSettingsPanel(false);
     setSelectedNode(null);
   };
 
-  const handleDrop = useCallback(
-    (item, monitor) => {
-      const clientOffset = monitor.getClientOffset();
-      if (!clientOffset) return;
-
-      const canvasPosition = project({
-        x: clientOffset.x,
-        y: clientOffset.y,
-      });
-
-      const id = uuidv4();
-      const label = `test node ${nodeCount}`;
-
-      setNodes((nds) => [
-        ...nds,
-        {
-          id: id,
-          type: item.type,
-          data: { label: label },
-          position: { x: canvasPosition.x - 200, y: canvasPosition.y - 200 },
-        },
-      ]);
-      setNodeCount(nodeCount + 1);
-    },
-    [nodeCount, project, setNodes]
-  );
-
-  const [{ isOver }, drop] = useDrop(() => ({
-    accept: ItemTypes.NODE,
-    drop: handleDrop,
-    collect: (monitor) => ({
-      isOver: !!monitor.isOver(),
-    }),
-  }));
-
-  // const [{ isOver }, drop] = useDrop(() => ({
-  //   accept: ItemTypes.NODE,
-  //   drop: (item, monitor) => {
-  //     const offset = monitor.getClientOffset();
-  //     if (!offset) return;
-
-  //     // Transform the drop coordinates to the canvas space
-  //     const transformed = project({ x: offset.x, y: offset.y });
-
-  //     // Adjust the coordinates by subtracting a certain value
-  //     const adjustedX = transformed.x - 250; // Adjust the value as needed
-  //     const adjustedY = transformed.y - 220; // Adjust the value as needed
-
-  //     const id = uuidv4();
-  //     const label = `test node ${nodeCount}`;
-
-  //     // Add the new node at the adjusted coordinates
-  //     setNodes((nds) => [
-  //       ...nds,
-  //       {
-  //         id: id,
-  //         type: item.type,
-  //         data: { label: label },
-  //         position: { x: adjustedX, y: adjustedY },
-  //       },
-  //     ]);
-  //     setNodeCount(nodeCount + 1);
-  //   },
-  //   collect: (monitor) => ({
-  //     isOver: !!monitor.isOver(),
-  //   }),
-  // }));
-
   return (
-    <ReactFlowProvider>
+    <>
+      {/* Header component */}
       <Header nodes={nodes} edges={edges} />
+
       <div className="app">
         <div className="panel">
+          {/* Conditional rendering for SettingsPanel or NodePanel */}
           {showSettingsPanel ? (
             <SettingsPanel
               node={selectedNode}
@@ -144,11 +72,14 @@ function App() {
             <NodePanel nodeCount={nodeCount} />
           )}
         </div>
+
+        {/* Main flow container */}
         <div
           className="flow"
           ref={drop}
-          style={{ border: isOver ? "2px solid green" : "none" }}
+          style={{ border: isOver ? "1px dashed #ddd" : "none" }}
         >
+          {/* ReactFlow component */}
           <ReactFlow
             nodes={nodes}
             edges={edges}
@@ -159,13 +90,14 @@ function App() {
             nodeTypes={nodeTypes}
             fitView
           >
+            {/* ReactFlow components */}
             <MiniMap />
             <Controls />
             <Background />
           </ReactFlow>
         </div>
       </div>
-    </ReactFlowProvider>
+    </>
   );
 }
 

@@ -22,15 +22,12 @@
   background-color: #b3efe5;
   border-radius: 4px 4px 0 0;
 }
-
 .custom-node .react-flow__handle {
   background: #555;
 }
-
 .custom-node .react-flow__handle-left {
   left: -3px;
 }
-
 .custom-node .react-flow__handle-right {
   right: -3px;
 }
