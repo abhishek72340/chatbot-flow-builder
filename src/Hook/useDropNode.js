@@ -27,7 +27,7 @@ const useDropNode = () => {
         ...nds,
         {
           id: id,
-          type: item.type,
+          type: item?.type,
           data: { label: label },
           position: { x: canvasPosition.x - 200, y: canvasPosition.y - 200 },
         },

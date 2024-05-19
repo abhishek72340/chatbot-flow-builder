@@ -1,10 +1,14 @@
 // containing an initial set of nodes for the flowchart
+import { MarkerType } from "reactflow";
 export const initialNodes = [
   {
     id: "1",
     type: "customNode",
     data: { label: "test message 1" },
     position: { x: 200, y: 5 },
+    markerEnd: {
+      type: MarkerType.Arrow,
+    },
   },
 ];
 
