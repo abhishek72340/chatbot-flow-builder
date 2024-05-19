@@ -1,27 +1,24 @@
-import { useState } from "react";
-import "./Sidebar.css";
+import { useDrag } from "react-dnd";
 import PropTypes from "prop-types";
-import { v4 as uuidv4 } from "uuid";
 import { TbMessage } from "react-icons/tb";
-const NodePanel = ({ setNodes }) => {
-  const [nodeCount, setNodeCount] = useState(2);
+import { ItemTypes } from "../../ItemTypes";
+import "./Sidebar.css";
 
-  const addTextNode = () => {
-    const id = uuidv4();
-    setNodes((nds) => [
-      ...nds,
-      {
-        id: id,
-        type: "customNode",
-        data: { label: "Default Node" + nodeCount },
-        position: { x: 250, y: 5 },
-      },
-    ]);
-    setNodeCount(nodeCount + 1);
-  };
+const NodePanel = ({ nodeCount }) => {
+  const [{ isDragging }, drag] = useDrag(() => ({
+    type: ItemTypes.NODE,
+    item: { type: "customNode", label: `test node ${nodeCount}` },
+    collect: (monitor) => ({
+      isDragging: !!monitor.isDragging(),
+    }),
+  }));
 
   return (
-    <div className="node-panel" onClick={addTextNode}>
+    <div
+      ref={drag}
+      className="node-panel"
+      style={{ opacity: isDragging ? 0.5 : 1 }}
+    >
       <TbMessage />
       <div>Message</div>
     </div>
@@ -29,6 +26,7 @@ const NodePanel = ({ setNodes }) => {
 };
 
 NodePanel.propTypes = {
-  setNodes: PropTypes.func.isRequired,
+  nodeCount: PropTypes.number.isRequired,
 };
+
 export default NodePanel;

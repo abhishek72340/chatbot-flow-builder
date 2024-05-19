@@ -17,7 +17,7 @@ const SettingsPanel = ({ node, onTextChange, hidePanel }) => {
   return (
     <>
       <div className="msg-header">
-        <IoMdArrowBack onClick={hidePanel} style={{ cursor: "pointer" }} />
+        <IoMdArrowBack onClick={hidePanel} />
         <div>Message</div>
       </div>
       <hr />
