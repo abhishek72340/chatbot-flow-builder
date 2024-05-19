@@ -40,3 +40,8 @@ hr {
   margin-top: 1rem;
   width: 100%;
 }
+@media screen and (max-width:600px){
+  .node-panel div{
+  display: none;
+  }
+}
