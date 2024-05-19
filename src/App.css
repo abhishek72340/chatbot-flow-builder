@@ -1,0 +1,17 @@
+.app {
+  display: flex;
+  height: 100vh;
+}
+.panel {
+  width: 20%;
+  padding: 10px;
+  border-left: 1.2px solid #ddd;
+  position: absolute;
+  right: 0;
+  height: 100%;
+}
+.flow {
+  width: 80%;
+  height: 100%;
+  position: relative;
+}
